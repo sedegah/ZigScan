@@ -1,3 +1,4 @@
+
 # ZigScan
 
 ZigScan is a fast CLI tool written in [Zig](https://ziglang.org/) for detecting invisible, control, or suspicious Unicode characters in a file.
