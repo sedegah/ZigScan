@@ -2,3 +2,4 @@
 Optimize CLI output
 Optimize CLI output
 Detect new Unicode patterns
+Fix edge case detection
