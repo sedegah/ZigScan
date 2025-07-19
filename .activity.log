@@ -6,3 +6,4 @@ Fix edge case detection
 Fix edge case detection
 Refine character classification
 Optimize CLI output
+Detect new Unicode patterns
