@@ -7,3 +7,4 @@ Fix edge case detection
 Refine character classification
 Optimize CLI output
 Detect new Unicode patterns
+Improve scanning depth
