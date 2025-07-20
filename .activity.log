@@ -2,3 +2,4 @@
 // Improve Zig CLI UX
 // Refactor Unicode scanner
 // Code cleanup
+// Update suspicious char rules
