@@ -46,3 +46,4 @@ Improve scanning depth
 // Code cleanup
 // Improve Zig CLI UX
 // Refactor Unicode scanner
+// Update suspicious char rules
