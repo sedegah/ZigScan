@@ -45,3 +45,4 @@
 // Update suspicious char rules
 // Refactor Unicode scanner
 // Refactor Unicode scanner
+// Improve Zig CLI UX
