@@ -69,3 +69,4 @@
 // Code cleanup
 // Improve Zig CLI UX
 // Update suspicious char rules
+// Refactor Unicode scanner
