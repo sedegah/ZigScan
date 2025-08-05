@@ -112,3 +112,4 @@
 // Update suspicious char rules
 // Refactor Unicode scanner
 // Improve Zig CLI UX
+// Code cleanup
