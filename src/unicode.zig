@@ -1,23 +1,31 @@
 const std = @import("std");
+const unicode = @import("unicode.zig");
 
-pub fn isInvisibleOrSuspicious(c: u21) bool {
-    return isInvisible(c) or isControl(c) or isConfusable(c);
-}
+pub fn main() void {
+    const args = std.process.argsAlloc(std.heap.page_allocator) catch unreachable;
+    if (args.len < 2) {
+        std.debug.print("Usage: zigscan <file>\n", .{});
+        return;
+    }
 
-fn isControl(c: u21) bool {
-    return c < 0x20 or (c >= 0x7f and c <= 0x9f);
-}
-
-fn isInvisible(c: u21) bool {
-    return switch (c) {
-        0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF => true,
-        else => false,
+    const path = args[1];
+    const file = std.fs.cwd().openFile(path, .{}) catch {
+        std.debug.print("Error: could not open file: {}\n", .{path});
+        return;
     };
-}
+    defer file.close();
 
-fn isConfusable(c: u21) bool {
-    return switch (c) {
-        0x03B1, 0x0430, 0xFF41 => true,
-        else => false,
-    };
+    const reader = file.reader();
+    var buf: [4096]u8 = undefined;
+
+    var pos: usize = 0;
+    while (reader.readUntilDelimiterOrEof(&buf, '\n') catch null) |line| {
+        for (line) |b, i| {
+            const cp = b;
+            if (unicode.isInvisibleOrSuspicious(cp)) {
+                std.debug.print("Suspicious char at line {} col {}: U+{x:04X}\n", .{ pos+1, i+1, cp });
+            }
+        }
+        pos += 1;
+    }
 }
