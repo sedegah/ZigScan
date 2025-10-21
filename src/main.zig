@@ -2,7 +2,8 @@ const std = @import("std");
 const unicode = @import("unicode.zig");
 
 pub fn main() !void {
-    const allocator = std.heap.page_allocator;
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    const allocator = gpa.allocator();
 
     const args = try std.process.argsAlloc(allocator);
     defer std.process.argsFree(allocator, args);
@@ -12,42 +13,29 @@ pub fn main() !void {
         return;
     }
 
-    const file_path = args[1];
-    const file = std.fs.cwd().openFile(file_path, .{ .read = true }) catch |err| {
-        std.debug.print("Error opening file '{}': {}\n", .{ file_path, err });
+    const path = args[1];
+    const file = std.fs.cwd().openFile(path, .{ .read = true }) catch |err| {
+        std.debug.print("Error opening file '{}': {}\n", .{ path, err });
         return;
     };
     defer file.close();
 
-    var buffered = std.io.bufferedReader(file.reader());
-    var reader = buffered.reader();
+    const reader = file.reader();
+    var buf: [4096]u8 = undefined;
 
-    var line_number: usize = 0;
-
-    while (try reader.readUntilDelimiterOrEofAlloc(allocator, '\n')) |line| {
-        defer allocator.free(line);
-        line_number += 1;
-
-        // Decode UTF-8 safely
-        var decoder = std.unicode.Utf8View.init(line);
-        var iterator = decoder.iterator();
-
-        var byte_index: usize = 0;
-        while (iterator.nextCodepoint()) |cp| {
-            const cp_len = std.unicode.utf8CodepointLength(cp) catch 1;
-
-            if (unicode.isInvisibleOrSuspicious(cp)) {
+    var line_no: usize = 1;
+    while (reader.readUntilDelimiterOrEof(&buf, '\n') catch |err| {
+        std.debug.print("Read error: {}\n", .{err});
+        return;
+    }) |line| {
+        for (line) |byte, col| {
+            if (unicode.isInvisibleOrSuspicious(byte)) {
                 std.debug.print(
-                    "⚠️ Suspicious char at line {d}, byte {d}: U+{x:04X}\n",
-                    .{ line_number, byte_index + 1, cp },
+                    "⚠️  Suspicious char at line {} col {}: U+{x:04X}\n",
+                    .{ line_no, col + 1, byte },
                 );
             }
-
-            byte_index += cp_len;
         }
-
-        if (decoder.iterator().invalid != 0) {
-            std.debug.print("⚠️ Warning: malformed UTF-8 sequence on line {d}\n", .{ line_number });
-        }
+        line_no += 1;
     }
 }
