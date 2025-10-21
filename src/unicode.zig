@@ -1,4 +1,4 @@
-explain this const std = @import("std");
+const std = @import("std");
 const unicode = @import("unicode.zig");
 
 pub fn main() void {
