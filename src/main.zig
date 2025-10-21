@@ -4,7 +4,6 @@ const unicode = @import("unicode.zig");
 pub fn main() !void {
     const allocator = std.heap.page_allocator;
 
-    // Handle command-line arguments
     const args = try std.process.argsAlloc(allocator);
     defer std.process.argsFree(allocator, args);
 
@@ -20,7 +19,6 @@ pub fn main() !void {
     };
     defer file.close();
 
-    // Buffered reading for efficiency
     var buffered = std.io.bufferedReader(file.reader());
     var reader = buffered.reader();
 
