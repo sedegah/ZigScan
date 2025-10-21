@@ -41,7 +41,7 @@ pub fn scanText(text: []const u8) !void {
 
         if (isInvisibleOrSuspicious(cp)) {
             std.debug.print(
-                "⚠️  Suspicious char at line {d} col {d}: U+{x:04X}\n",
+                "  Suspicious char at line {d} col {d}: U+{x:04X}\n",
                 .{ line_no, col_no, cp },
             );
         }
@@ -50,6 +50,6 @@ pub fn scanText(text: []const u8) !void {
     }
 
     if (decoder.errors != 0) {
-        std.debug.print("❌ UTF-8 decoding errors encountered: {d}\n", .{decoder.errors});
+        std.debug.print(" UTF-8 decoding errors encountered: {d}\n", .{decoder.errors});
     }
 }
