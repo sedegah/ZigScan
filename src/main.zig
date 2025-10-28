@@ -28,14 +28,24 @@ pub fn main() !void {
         std.debug.print("Read error: {}\n", .{err});
         return;
     }) |line| {
-        for (line) |byte, col| {
-            if (unicode.isInvisibleOrSuspicious(byte)) {
+        // Process the line with proper UTF-8 decoding
+        var decoder = std.unicode.Utf8Decoder.init(line);
+        var col_no: usize = 1;
+        
+        while (decoder.next()) |cp| {
+            if (unicode.isZeroWidthCharacter(cp)) {
                 std.debug.print(
-                    "⚠️  Suspicious char at line {} col {}: U+{x:04X}\n",
-                    .{ line_no, col + 1, byte },
+                    "⚠️  Zero-width char at line {} col {}: U+{x:04X} ({s})\n",
+                    .{ line_no, col_no, cp, unicode.getZeroWidthCharName(cp) },
                 );
             }
+            col_no += 1;
         }
+        
+        if (decoder.errors != 0) {
+            std.debug.print("  Warning: UTF-8 errors in line {}\n", .{line_no});
+        }
+        
         line_no += 1;
     }
 }
